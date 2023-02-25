@@ -4,9 +4,11 @@ from routes.login import userlogin
 from routes.fileupload import file
 from routes.preprocess import pre
 import os
+from decouple import config
 
-os.environ['MONGODB_URI'] = "mongodb+srv://akashshetgar:NECHQPZa4yyMzmtZ@dataforgecluster1.v5fwvnn.mongodb.net/test"
-os.environ['SECRET_KEY'] = "thisisasecretkey"
+os.environ["MONGODB_URI"] = config("MONGODB_URI")
+os.environ["SECRET_KEY"] = config("SECRET_KEY")
+
 
 app = FastAPI()
 app.include_router(user)
