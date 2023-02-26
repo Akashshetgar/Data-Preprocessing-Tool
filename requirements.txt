@@ -173,7 +173,7 @@ pyOpenSSL==23.0.0
 pyparsing==2.4.7
 pyperclip==1.8.2
 pyphen==0.13.2
-pypiwin32==223
+
 pyrsistent==0.18.1
 python-dateutil==2.8.2
 python-decouple==3.7
