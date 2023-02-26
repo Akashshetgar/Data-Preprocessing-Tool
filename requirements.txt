@@ -182,7 +182,7 @@ python-multipart==0.0.5
 python-socketio==5.4.1
 pyttsx3==2.90
 pytz==2022.7.1
-pywin32==300
+
 pywinpty==2.0.5
 PyYAML==5.4.1
 pyzmq==22.3.0
