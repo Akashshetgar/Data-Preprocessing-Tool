@@ -132,17 +132,26 @@ async def drop_nan(user_id:str, column_name:str):
         return {"message": "Column not found", "error": str(e)}
     
 
-@pre.post("/one-hot-encoding/{user_id}")
-async def one_hot_encoding(user_id:str, column_names: List[str]=Body(...)):
+@pre.get("/one-hot-encoding/{user_id}/{column_names}")
+async def one_hot_encoding(user_id:str, column_names: str):
     global collection
     result = collection.find_one({"id": user_id})
     if not result:
         raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
+    columns = column_names.split(",")
+    
+  
 
     try:
-        df = pd.get_dummies(df, columns=column_names)
+
+        try:
+            df = pd.get_dummies(df, columns=columns)
+        except Exception as e:
+            return {"message": "error", "error": str(e)}
+        
+        # df = pd.concat([df, encoded_data], axis=1)
         data = df.to_dict(orient='records')
         obj= {
                 "id":user_id, 
@@ -153,7 +162,7 @@ async def one_hot_encoding(user_id:str, column_names: List[str]=Body(...)):
             db["datasets"].delete_one({"id":user_id})
         collection = db["datasets"]
         collection.insert_one(obj)
-        return {"message": "One hot encoding done successfully"}
+        return {"message":"One hot encoding completed successfully for columns: {}".format(columns)}
     except Exception as e:
         return {"message": "Column not found", "error": str(e)}
     
@@ -164,7 +173,7 @@ async def tokenize(user_id:str, column_name:str):
     if not result:
         raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
-    df = pd.DataFrame.from_dict
+    df = pd.DataFrame.from_dict(dict_file)
 
     try:
         tokenized_col = df[column_name].apply(lambda x: word_tokenize(x) if type(x) == str else x)
@@ -191,11 +200,12 @@ async def remove_stopwords(user_id:str, column_name:str):
     if not result:
         raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
-    df = pd.DataFrame.from_dict
+    df = pd.DataFrame.from_dict(dict_file)
 
     try:
+        new_col_name = f"{column_name}_stopwords_removed"
         stop_words = set(stopwords.words('english'))
-        df[column_name] = df[column_name].apply(lambda x: [word for word in x if word not in stop_words])
+        df[new_col_name] = df[column_name].apply(lambda x: [word for word in x if word not in stop_words])
         data = df.to_dict(orient='records')
         obj= {
                 "id":user_id, 
