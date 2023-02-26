@@ -6,7 +6,6 @@ from typing import List
 from config.db import db,users
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from sklearn.preprocessing import OneHotEncoder
 
 pre = APIRouter()
 
