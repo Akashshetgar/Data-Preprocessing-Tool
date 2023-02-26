@@ -1,11 +1,12 @@
-from fastapi import FastAPI, Query
-from fastapi import APIRouter
+from fastapi import FastAPI, Query,Body
+from fastapi import APIRouter, HTTPException
 from pymongo import MongoClient
 import pandas as pd
 from typing import List
 from config.db import db,users
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+from sklearn.preprocessing import OneHotEncoder
 
 pre = APIRouter()
 
@@ -14,6 +15,8 @@ collection = db["datasets"]
 @pre.get("/get_csv_column_info/{user_id}")
 async def get_csv_column_info(user_id: str):
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
     
@@ -27,7 +30,10 @@ async def get_csv_column_info(user_id: str):
 
 @pre.get("/rename_colums/{user_id}/{old_name}/{new_name}")
 async def rename_columns(user_id:str, old_name:str, new_name:str):
+    global collection
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
 
@@ -49,7 +55,10 @@ async def rename_columns(user_id:str, old_name:str, new_name:str):
 
 @pre.get("/drop_columns/{user_id}/{column_name}")
 async def drop_columns(user_id:str, column_name:str):
+    global collection
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
 
@@ -71,7 +80,10 @@ async def drop_columns(user_id:str, column_name:str):
     
 @pre.get("/fill_nan/{user_id}/{column_name}/{isvalue}/{value}")
 async def fill_nan(user_id:str, column_name:str, isvalue:str, value:str):
+    global collection
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
 
@@ -96,7 +108,10 @@ async def fill_nan(user_id:str, column_name:str, isvalue:str, value:str):
     
 @pre.get("/drop_nan/{user_id}/{column_name}")
 async def drop_nan(user_id:str, column_name:str):
+    global collection
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
 
@@ -117,11 +132,14 @@ async def drop_nan(user_id:str, column_name:str):
         return {"message": "Column not found", "error": str(e)}
     
 
-@pre.get("/one-hot-encoding/{user_id}")
-async def one_hot_encoding(user_id:str, column_names: List[str] = Query(...)):
+@pre.post("/one-hot-encoding/{user_id}")
+async def one_hot_encoding(user_id:str, column_names: List[str]=Body(...)):
+    global collection
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
-    df = pd.DataFrame.from_dict
+    df = pd.DataFrame.from_dict(dict_file)
 
     try:
         df = pd.get_dummies(df, columns=column_names)
@@ -141,7 +159,10 @@ async def one_hot_encoding(user_id:str, column_names: List[str] = Query(...)):
     
 @pre.get('/tokenize/{user_id}/{column_name}')
 async def tokenize(user_id:str, column_name:str):
+    global collection
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict
 
@@ -165,7 +186,10 @@ async def tokenize(user_id:str, column_name:str):
     
 @pre.get('/remove_stopwords/{user_id}/{column_name}')
 async def remove_stopwords(user_id:str, column_name:str):
+    global collection
     result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict
 

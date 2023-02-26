@@ -4,10 +4,10 @@ from routes.login import userlogin
 from routes.fileupload import file
 from routes.preprocess import pre
 import os
-from decouple import config
+# from decouple import config
 
-os.environ["MONGODB_URI"] = config("MONGODB_URI")
-os.environ["SECRET_KEY"] = config("SECRET_KEY")
+# os.environ["MONGODB_URI"] = config("MONGODB_URI")
+# os.environ["SECRET_KEY"] = config("SECRET_KEY")
 
 
 app = FastAPI()

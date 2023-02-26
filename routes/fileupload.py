@@ -17,7 +17,19 @@ async def upload_csv(user_id, file: UploadFile = File(...)):
         return {"message": "User not found"}
 
     # Read the CSV file using pandas
-    df = pd.read_csv(file.file,encoding='ISO-8859-1')
+    try:
+        df = pd.read_csv(file.file,encoding='ISO-8859-1')    
+        
+    except Exception as e:
+        try:
+            df = pd.read_csv(file.file,encoding='utf-8')
+            
+        except Exception as e:
+            try:
+                df = pd.read_csv(file.file,encoding='cp1252')
+            except Exception as e:
+                return {"message": "Error reading the CSV file", "error": str(e)}
+            
 
 
     #deleting the previous data
