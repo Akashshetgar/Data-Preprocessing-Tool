@@ -183,7 +183,7 @@ python-socketio==5.4.1
 pyttsx3==2.90
 pytz==2022.7.1
 
-pywinpty==2.0.5
+
 PyYAML==5.4.1
 pyzmq==22.3.0
 qtconsole==5.3.0
