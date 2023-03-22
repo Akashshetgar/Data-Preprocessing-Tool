@@ -2,10 +2,12 @@ from fastapi import APIRouter
 from models.userModel import User, UserLogin
 from config.db import users
 import os 
+import json
 
 from typing import Optional
 from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 import jwt
 from passlib.hash import bcrypt
 
@@ -61,7 +63,14 @@ async def register(user_data: User):
     # Create a JWT token for the user
     token = create_jwt_token(user_id)
 
-    return {"message": "User registered successfully", "token": token}
+    userObj = {
+        "id":str(user_id),
+        "username": user_data.username,
+        "email": user_data.email,
+        "profileImage": profile_picture_path
+    }
+
+    return {"message": "User registered successfully", "token": token,"user":userObj}
 
     # Define a route for user login
 @userlogin.post("/login")
@@ -73,7 +82,17 @@ async def login(user_data: UserLogin):
     if user and bcrypt.verify(user_data.password, user.password):
         # Create a JWT token for the user
         token = create_jwt_token(user.id)
+        # user = json.dumps(user)
+        # user = jsonable_encoder(user)
+        userObj = {
+            "id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "profileImage":user.profileImage
+        }
+        # userObj = json.dumps(userObj)
+        # userObj = json.loads(str(userObj))
 
-        return {"message": "Logged in successfully", "token": token}
+        return JSONResponse(content={"message": "Logged in successfully", "token": token, "user": userObj},status_code=200)
 
     return JSONResponse(content={"message": "Invalid email or password"}, status_code=401)
