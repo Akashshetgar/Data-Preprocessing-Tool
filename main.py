@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes.crud import user
 from routes.login import userlogin
 from routes.fileupload import file
@@ -11,6 +12,13 @@ import os
 
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(user)
 app.include_router(userlogin)
 app.include_router(file)
