@@ -4,6 +4,7 @@ from models.fileModel import FileModel
 from bson import ObjectId
 import pandas as pd
 from config.db import db,users
+import json
 
 file = APIRouter()
 
@@ -37,6 +38,10 @@ async def upload_csv(user_id, file: UploadFile = File(...)):
         db["datasets"].delete_one({"id":user_id})
 
     # Save the data to MongoDB
+    dataHead = df.head()
+    res = dataHead.to_json(orient="records")
+    parsed = json.loads(res)
+
     data = df.to_dict(orient='records')
     obj= {
             "id":user_id, 
@@ -45,4 +50,4 @@ async def upload_csv(user_id, file: UploadFile = File(...)):
     collection = db["datasets"]
     collection.insert_one(obj)
 
-    return {"message": f"{len(data)} records saved to datasets collection"}
+    return {"message": f"{len(data)} records saved to datasets collection", "data": parsed}
