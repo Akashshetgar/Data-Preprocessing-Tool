@@ -51,3 +51,44 @@ async def upload_csv(user_id, file: UploadFile = File(...)):
     collection.insert_one(obj)
 
     return {"message": f"{len(data)} records saved to datasets collection", "data": parsed}
+
+@file.get("/get_csv_head/{user_id}")
+async def get_csv_head(user_id):
+    # Verify the user exists in the database
+    user = users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        return {"message": "User not found"}
+
+    # Read the CSV file using pandas
+    try:
+        file_object = db["datasets"].find_one({"id": user_id})
+        head = file_object["file"]
+        head = pd.DataFrame.from_dict(head).head()
+        res = head.to_json(orient="records")
+        parsed = json.loads(res)
+        return {"message": "success","head": parsed}
+        
+    except Exception as e:
+        
+        return {"message": "Error getting the CSV file", "error": str(e)}
+    
+@file.get("/get_csv/{user_id}")
+async def get_csv(user_id):
+    # Verify the user exists in the database
+    user = users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        return {"message": "User not found"}
+
+    # Read the CSV file using pandas
+    try:
+        file_object = db["datasets"].find_one({"id": user_id})
+        head = file_object["file"]
+        head = pd.DataFrame.from_dict(head)
+        res = head.to_json(orient="records")
+        parsed = json.loads(res)
+        return {"message": "success","head": parsed}
+
+        
+    except Exception as e:
+        
+        return {"message": "Error getting the CSV file", "error": str(e)}
