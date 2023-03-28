@@ -8,8 +8,6 @@ import json
 
 file = APIRouter()
 
-
-
 @file.post("/upload-csv/{user_id}")
 async def upload_csv(user_id, file: UploadFile = File(...)):
     # Verify the user exists in the database

@@ -4,6 +4,7 @@ from routes.crud import user
 from routes.login import userlogin
 from routes.fileupload import file
 from routes.preprocess import pre
+from routes.pipeline import pipe
 import os
 # from decouple import config
 
@@ -23,6 +24,7 @@ app.include_router(user)
 app.include_router(userlogin)
 app.include_router(file)
 app.include_router(pre)
+app.include_router(pipe)
 
 @app.get("/")
 async def home():

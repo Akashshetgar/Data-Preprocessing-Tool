@@ -11,10 +11,7 @@ from fastapi.encoders import jsonable_encoder
 import jwt
 from passlib.hash import bcrypt
 
-
-
 userlogin = APIRouter()
-
 
 # Define a function to create a JWT token for a user
 def create_jwt_token(user_id: str) -> str:
