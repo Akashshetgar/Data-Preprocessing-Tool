@@ -77,8 +77,8 @@ async def drop_columns(user_id:str, column_name:str):
     except Exception as e:
         return {"message": "Column not found", "error": str(e)}
     
-@pre.get("/fill_nan/{user_id}/{column_name}/{isvalue}/{value}")
-async def fill_nan(user_id:str, column_name:str, isvalue:str, value:str):
+@pre.get("/fill_nan/{user_id}/{column_name}/{value}")
+async def fill_nan(user_id:str, column_name:str,value:str):
     global collection
     result = collection.find_one({"id": user_id})
     if not result:
@@ -87,7 +87,7 @@ async def fill_nan(user_id:str, column_name:str, isvalue:str, value:str):
     df = pd.DataFrame.from_dict(dict_file)
 
     try:
-        if isvalue == "true":
+        if value.length >0:
             df[column_name].fillna(value, inplace=True)
         else:
             df[column_name].fillna(method = value, inplace=True)
@@ -219,5 +219,28 @@ async def remove_stopwords(user_id:str, column_name:str):
     except Exception as e:
         return {"message": "Column not found", "error": str(e)}
 
+@pre.get("/change_col_dtype/{user_id}/{column_name}/{data_type}")
+async def drop_nan(user_id:str, column_name:str, data_type:str):
+    global collection
+    result = collection.find_one({"id": user_id})
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+    dict_file = result["file"]
+    df = pd.DataFrame.from_dict(dict_file)
 
+    try:
+        df[column_name] = df[column_name].astype(data_type)
+        data = df.to_dict(orient='records')
+        obj= {
+                "id":user_id, 
+                "file":data
+            }
+        #deleting the previous data
+        if db["datasets"].find_one({"id":user_id}): 
+            db["datasets"].delete_one({"id":user_id})
+        collection = db["datasets"]
+        collection.insert_one(obj)
+        return {"message": "Column data type changed successfully"}
+    except Exception as e:
+        return {"message": "Data type couldn't be changed", "error": str(e)}
 
