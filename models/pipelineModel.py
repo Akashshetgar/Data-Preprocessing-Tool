@@ -3,4 +3,4 @@ from typing import List
 
 class PipelineModel(BaseModel):
     pipeline_name:str
-    pipeline: list[list[str]]
+    pipeline: List[list[str]]
