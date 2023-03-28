@@ -6,6 +6,7 @@ from typing import List
 from config.db import db,users
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
+import urllib.parse
 
 pre = APIRouter()
 
@@ -36,6 +37,9 @@ async def rename_columns(user_id:str, old_name:str, new_name:str):
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
 
+    old_name = urllib.parse.unquote(old_name)
+    new_name = urllib.parse.unquote(new_name)
+
     try:
         df.rename(columns={old_name: new_name}, inplace=True)
         data = df.to_dict(orient='records')
@@ -61,6 +65,8 @@ async def drop_columns(user_id:str, column_name:str):
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
 
+    column_name = urllib.parse.unquote(column_name)
+
     try:
         df.drop(columns=column_name, inplace=True)
         data = df.to_dict(orient='records')
@@ -85,6 +91,9 @@ async def fill_nan(user_id:str, column_name:str,value:str):
         raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
+
+    column_name = urllib.parse.unquote(column_name)
+
 
     try:
         if value.length >0:
@@ -113,6 +122,8 @@ async def drop_nan(user_id:str, column_name:str):
         raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
+
+    column_name = urllib.parse.unquote(column_name)
 
     try:
         df.dropna(subset=[column_name], inplace=True)
@@ -174,6 +185,8 @@ async def tokenize(user_id:str, column_name:str):
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
 
+    column_name = urllib.parse.unquote(column_name)
+
     try:
         tokenized_col = df[column_name].apply(lambda x: word_tokenize(x) if type(x) == str else x)
         new_col_name = f"{column_name}_tokenized"
@@ -200,6 +213,8 @@ async def remove_stopwords(user_id:str, column_name:str):
         raise HTTPException(status_code=404, detail="User not found")
     dict_file = result["file"]
     df = pd.DataFrame.from_dict(dict_file)
+
+    column_name = urllib.parse.unquote(column_name)
 
     try:
         new_col_name = f"{column_name}_stopwords_removed"
