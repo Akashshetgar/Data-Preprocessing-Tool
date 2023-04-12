@@ -5,6 +5,8 @@ from routes.login import userlogin
 from routes.fileupload import file
 from routes.preprocess import pre
 from routes.pipeline import pipe
+from routes.delete import rem
+from routes.download import down
 import os
 # from decouple import config
 
@@ -25,6 +27,8 @@ app.include_router(userlogin)
 app.include_router(file)
 app.include_router(pre)
 app.include_router(pipe)
+app.include_router(rem)
+app.include_router(down)
 
 @app.get("/")
 async def home():

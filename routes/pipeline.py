@@ -34,3 +34,16 @@ async def upload_csv(user_id:str, pipeline:PipelineModel):
          return {"message": "Error saving pipeline", "error": str(e)}
 
     return {"message": "Pipeline saved"}
+
+@pipe.get("/get-pipeline/{user_id}")
+async def get_pipeline(user_id:str):
+    # Verify the user exists in the database
+    user = users.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        return {"message": "User not found"}
+    
+    pipeLine = db["pipelines"].find({"id":user_id})
+    if not pipeLine:
+        return {"message": "Pipelines not found"}
+    
+    return {"message": "Pipelines fetched successfully", "data":pipeLine}
