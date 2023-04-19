@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from models.userModel import User, UserLogin
 from config.db import users
 import os 
 import json
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 from typing import Optional
 from datetime import datetime, timedelta
@@ -12,6 +13,7 @@ import jwt
 from passlib.hash import bcrypt
 
 userlogin = APIRouter()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Define a function to create a JWT token for a user
 def create_jwt_token(user_id: str) -> str:

@@ -22,7 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(user)
+# app.include_router(user)
 app.include_router(userlogin)
 app.include_router(file)
 app.include_router(pre)

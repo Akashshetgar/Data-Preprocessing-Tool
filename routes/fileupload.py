@@ -1,15 +1,16 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Depends
 from fastapi import APIRouter
 from models.fileModel import FileModel
 from bson import ObjectId
 import pandas as pd
 from config.db import db,users
 import json
-
+from fastapi.security import OAuth2PasswordBearer
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 file = APIRouter()
 
 @file.post("/upload-csv/{user_id}")
-async def upload_csv(user_id, file: UploadFile = File(...)):
+async def upload_csv(user_id= Depends(oauth2_scheme), file: UploadFile = File(...)):
     # Verify the user exists in the database
     user = users.find_one({"_id": ObjectId(user_id)})
     if not user:

@@ -1,10 +1,13 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Depends
 from fastapi import APIRouter
 from models.pipelineModel import PipelineModel
 from bson import ObjectId
 import pandas as pd
 from config.db import db,users
+from schemas.pipelineSchema import pipelines_serializer
 import json
+from fastapi.security import OAuth2PasswordBearer
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 pipe = APIRouter()
 
@@ -42,7 +45,8 @@ async def get_pipeline(user_id:str):
     if not user:
         return {"message": "User not found"}
     
-    pipeLine = db["pipelines"].find({"id":user_id})
+    pipeLine = pipelines_serializer(db["pipelines"].find({"id":user_id}))
+    
     if not pipeLine:
         return {"message": "Pipelines not found"}
     
